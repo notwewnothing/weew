@@ -120,11 +120,6 @@ jobs:
       - name: Install ${{matrix.platform}} dependencies
         run: |
           flutter clean
-          cd ios
-          pod repo update
-          pod deintegrate
-          pod install --repo-update
-          cd ..
           flutter pub get
           dart cli/cli.dart install-dependencies --platform=${{matrix.platform}} --arch=${{matrix.arch}}
 
