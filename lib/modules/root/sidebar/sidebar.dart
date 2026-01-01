@@ -37,7 +37,16 @@ class Sidebar extends HookConsumerWidget {
       [context.l10n],
     );
 
-    final tileList = [...sidebarTileList, ...sidebarLibraryTileList];
+    final retroPlayerTileList = useMemoized(
+      () => getRetroPlayerTileList(context.l10n),
+      [context.l10n],
+    );
+
+    final tileList = [
+      ...sidebarTileList,
+      ...sidebarLibraryTileList,
+      ...retroPlayerTileList
+    ];
 
     final router = context.watchRouter;
 
@@ -82,6 +91,23 @@ class Sidebar extends HookConsumerWidget {
       if (mediaQuery.lgAndUp)
         NavigationLabel(child: Text(context.l10n.library)),
       for (final tile in sidebarLibraryTileList)
+        NavigationButton(
+          style: router.currentPath.startsWith(tile.pathPrefix)
+              ? const ButtonStyle.secondary()
+              : null,
+          label: mediaQuery.lgAndUp ? Text(tile.title) : null,
+          onPressed: () {
+            context.navigateTo(tile.route);
+          },
+          child: Tooltip(
+            tooltip: TooltipContainer(child: Text(tile.title)).call,
+            child: Icon(tile.icon),
+          ),
+        ),
+      const NavigationDivider(),
+      if (mediaQuery.lgAndUp)
+        NavigationLabel(child: const Text("Retro Players")),
+      for (final tile in retroPlayerTileList)
         NavigationButton(
           style: router.currentPath.startsWith(tile.pathPrefix)
               ? const ButtonStyle.secondary()

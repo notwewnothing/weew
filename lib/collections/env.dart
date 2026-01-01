@@ -17,9 +17,9 @@ abstract class Env {
   static final String lastFmApiSecret = _Env.lastFmApiSecret;
 
   @EnviedField(varName: 'HIDE_DONATIONS', defaultValue: "0")
-  static final int _hideDonations = _Env._hideDonations;
+  static final String _hideDonations = _Env._hideDonations;
 
-  static bool get hideDonations => _hideDonations == 1;
+  static bool get hideDonations => _hideDonations == "1";
 
   @EnviedField(varName: 'ENABLE_UPDATE_CHECK', defaultValue: "1")
   static final String _enableUpdateChecker = _Env._enableUpdateChecker;

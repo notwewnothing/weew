@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:spotube/collections/routes.gr.dart';
+import 'package:spotube/features/retro_player/screens/cassette_player_screen.dart';
+import 'package:spotube/features/retro_player/screens/vinyl_player_screen.dart';
 import 'package:spotube/provider/metadata_plugin/core/auth.dart';
 import 'package:spotube/services/kv_store/kv_store.dart';
 
@@ -222,6 +224,14 @@ class AppRouter extends RootStackRouter {
           path: "/lastfm-login",
           page: LastFMLoginRoute.page,
           // parentNavigatorKey: rootNavigatorKey,
+        ),
+        AutoRoute(
+          path: "/cassette-player",
+          page: CassettePlayerRoute.page,
+        ),
+        AutoRoute(
+          path: "/vinyl-player",
+          page: VinylPlayerRoute.page,
         ),
       ];
 }

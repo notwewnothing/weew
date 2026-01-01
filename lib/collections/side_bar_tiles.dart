@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/material.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:spotube/collections/routes.gr.dart';
 import 'package:spotube/collections/spotube_icons.dart';
@@ -79,6 +80,23 @@ List<SideBarTiles> getSidebarLibraryTileList(AppLocalizations l10n) => [
         title: l10n.local_library,
         route: const UserLocalLibraryRoute(),
         icon: SpotubeIcons.device,
+      ),
+    ];
+
+List<SideBarTiles> getRetroPlayerTileList(AppLocalizations l10n) => [
+      SideBarTiles(
+        id: "cassette_player",
+        pathPrefix: "/cassette-player",
+        title: "Cassette",
+        route: const CassettePlayerRoute(),
+        icon: Icons.album,
+      ),
+      SideBarTiles(
+        id: "vinyl_player",
+        pathPrefix: "/vinyl-player",
+        title: "Vinyl",
+        route: const VinylPlayerRoute(),
+        icon: Icons.album,
       ),
     ];
 

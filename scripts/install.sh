@@ -2,12 +2,12 @@
 
 # Varibles
 fname="$(basename $0)"
-installDir='/usr/share/spotube'
-desktopFile='/usr/share/applications/spotube.desktop'
-appdata='/usr/share/appdata/spotube.appdata.xml'
-icon='/usr/share/icons/spotube/spotube-logo.png'
-symlink='/usr/bin/spotube'
-temp='/tmp/spotube-installer'
+installDir='/usr/share/weew'
+desktopFile='/usr/share/applications/weew.desktop'
+appdata='/usr/share/appdata/weew.appdata.xml'
+icon='/usr/share/icons/weew/weew-logo.png'
+symlink='/usr/bin/weew'
+temp='/tmp/weew-installer'
 latestVer="$(wget -qO- "https://api.github.com/repos/KRTirtho/spotube/releases/latest" \ | grep -Po '"tag_name": "\K.*?(?=")')"
 
 # Root check - From CAAIS (https://codeberg.org/RaptaG/CAAIS), under GPL-3.0
@@ -22,10 +22,10 @@ function rootCheck() {
 # Flags
 function help(){
   echo "Usage: sudo ./${fname} [flags]"
-  echo 'Flags:'
-  echo '  -i, --install <version>    Install any Spotube version (if not specified, the latest is installed).'
-  echo '  -h, --help                 This help menu'
-  echo '  -r, --remove               Removes Spotube from your system'
+    echo 'Flags:'
+    echo '  -i, --install <version>    Install any Weew version (if not specified, the latest is installed).'
+    echo '  -h, --help                 This help menu'
+    echo '  -r, --remove               Removes Weew from your system'
   exit 0
 }
 
@@ -55,14 +55,14 @@ function install_deps(){
     #    # JsonCpp
     #    wget https://github.com/open-source-parsers/jsoncpp/tarball/master -O jsoncpp.tar.gz
     #    tar -xf jsoncpp.tar.gz && cd open-source-parsers-jsoncpp-*
-        echo 'You have to install some dependancies manually in order for Spotube to work.'
+        echo 'You have to install some dependancies manually in order for Weew to work.'
         echo "The deps are the following: ${rpmDeps}"
     fi
 }
 
 function download_extract_spotube(){
-  local tarPath="/tmp/spotube-${ver}.tar.xz"
-  local donwloadURL="https://github.com/KRTirtho/spotube/releases/download/v${ver}/spotube-linux-${ver}-x86_64.tar.xz"
+    local tarPath="/tmp/weew-${ver}.tar.xz"
+    local donwloadURL="https://github.com/KRTirtho/spotube/releases/download/v${ver}/spotube-linux-${ver}-x86_64.tar.xz"
 
   if [ "${ver}" = "nightly" ]; then
       downloadURL"=https://github.com/KRTirtho/spotube/releases/download/nightly/spotube-linux-nightly-x86_64.tar.xz"
@@ -75,7 +75,7 @@ function download_extract_spotube(){
   if [ -f ${tarPath} ]; then
     echo "Installation file detected. Skipping download..."
   else
-    echo "Downloading spotube-${ver}.tar.xz..."
+    echo "Downloading weew-${ver}.tar.xz..."
     wget -q ${downloadURL} -P ${tarPath}
   fi
 
@@ -96,42 +96,42 @@ function download_extract_spotube(){
   fi
 }
 
-function install_spotube(){
+function install_weew(){
     if [ -d ${installDir} ]; then
-        echo -n "Spotube is already installed. Do you want to reinstall it? [y/N] "
+        echo -n "Weew is already installed. Do you want to reinstall it? [y/N] "
         read reinstall
 
         case "${reinstall}" in
         [yY]*)
-            uninstall_spotube ;;
+            uninstall_weew ;;
         *)
             echo 'Aborting installation...'
             exit 1 ;;
         esac
     fi
 
-    # Install Spotube from temp dir
+    # Install Weew from temp dir
     mkdir -p ${installDir}
     mv ${temp}/data ${installDir}
     mv ${temp}/lib ${installDir}
-    mv ${temp}/spotube ${installDir}
-    mv ${temp}/spotube.desktop ${desktopDir}
-    mv ${temp}/com.github.KRTirtho.Spotube.appdata.xml ${appdata}
-    mkdir -p /usr/share/icons/spotube
-    mv ${temp}/spotube-logo.png ${icon}
-    ln -s /usr/share/spotube/spotube ${symlink}
+    mv ${temp}/weew ${installDir}
+    mv ${temp}/weew.desktop ${desktopDir}
+    mv ${temp}/com.github.KRTirtho.Weew.appdata.xml ${appdata}
+    mkdir -p /usr/share/icons/weew
+    mv ${temp}/weew-logo.png ${icon}
+    ln -s /usr/share/weew/weew ${symlink}
 
     rm -rf ${temp}  # Remove temp dir
-    echo "Spotube ${ver} has been installed successfully!"
+    echo "Weew ${ver} has been installed successfully!"
 }
 
-function uninstall_spotube(){
-    echo -n "Are you sure you want to uninstall Spotube? [y/N] "
+function uninstall_weew(){
+    echo -n "Are you sure you want to uninstall Weew? [y/N] "
     read confirm
 
     case "${confirm}" in
     [yY]*)
-            echo 'Unstalling Spotube..'
+            echo 'Unstalling Weew..'
             rm -rf ${installDir} ${desktopDir} ${appdata} ${icon} ${symlink} ;;
     *)
             echo 'Aborting...'
@@ -147,14 +147,14 @@ case "$1" in
         ver="${latestVer}"
     fi
     
-    rootCheck
-    install_deps
-    download_extract_spotube
-    install_spotube
+     rootCheck
+     install_deps
+     download_extract_spotube
+     install_weew
     exit 0 ;;
--r | --remove)
-    rootCheck
-    uninstall_spotube
+ -r | --remove)
+     rootCheck
+     uninstall_weew
     exit 0 ;;
 -h | --help | "")
     help

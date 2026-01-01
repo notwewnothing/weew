@@ -37,7 +37,7 @@ class AboutSpotubePage extends HookConsumerWidget {
         headers: [
           TitleBar(
             leading: const [BackButton()],
-            title: Text(context.l10n.about_spotube),
+            title: Text("Hi <3"),
           )
         ],
         child: SingleChildScrollView(
@@ -52,7 +52,9 @@ class AboutSpotubePage extends HookConsumerWidget {
                 Center(
                   child: Column(
                     children: [
-                      Text(context.l10n.spotube_description).semiBold().large(),
+                      Text("Music app made by a stupid 16yo guy from his bedroom")
+                          .semiBold()
+                          .large(),
                       const SizedBox(height: 20),
                       Table(
                         columnWidths: const {
@@ -68,8 +70,8 @@ class AboutSpotubePage extends HookConsumerWidget {
                               colon,
                               TableCell(
                                 child: Hyperlink(
-                                  context.l10n.kingkor_roy_tirtho,
-                                  "https://github.com/KRTirtho",
+                                  "Poldak._",
+                                  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                                 ),
                               )
                             ],
@@ -78,7 +80,7 @@ class AboutSpotubePage extends HookConsumerWidget {
                             cells: [
                               TableCell(child: Text(context.l10n.version)),
                               colon,
-                              TableCell(child: Text("v${packageInfo.version}"))
+                              TableCell(child: Text("v67"))
                             ],
                           ),
                           TableRow(
@@ -104,8 +106,8 @@ class AboutSpotubePage extends HookConsumerWidget {
                               colon,
                               TableCell(
                                 child: Hyperlink(
-                                  "spotube.krtirtho.dev",
-                                  "https://spotube.krtirtho.dev",
+                                  "nigga sybau",
+                                  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                                 ),
                               ),
                             ],
@@ -116,8 +118,8 @@ class AboutSpotubePage extends HookConsumerWidget {
                               colon,
                               const TableCell(
                                 child: Hyperlink(
-                                  "github.com/KRTirtho/spotube",
-                                  "https://github.com/KRTirtho/spotube",
+                                  "github.com/wewnothing/weew",
+                                  "https://github.com/notwewnothing",
                                 ),
                               ),
                             ],
@@ -141,7 +143,7 @@ class AboutSpotubePage extends HookConsumerWidget {
                               const TableCell(
                                 child: Hyperlink(
                                   "Discord#chat",
-                                  "https://discord.gg/uJ94vxB6vg",
+                                  "",
                                 ),
                               ),
                             ],
@@ -156,23 +158,22 @@ class AboutSpotubePage extends HookConsumerWidget {
                   cursor: SystemMouseCursors.click,
                   child: GestureDetector(
                     onTap: () => launchUrl(
-                      Uri.parse("https://discord.gg/uJ94vxB6vg"),
+                      Uri.parse("https://discord.com"),
                       mode: LaunchMode.externalApplication,
                     ),
                     child: const UniversalImage(
-                      path:
-                          "https://discord.com/api/guilds/1012234096237350943/widget.png?style=banner2",
+                      path: "https://discord.com",
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  context.l10n.made_with,
+                  "Made with ❤️ in Tunisia🇹🇳",
                   textAlign: TextAlign.center,
                   style: theme.typography.small,
                 ),
                 Text(
-                  context.l10n.copyright(DateTime.now().year),
+                  "Copiright 2069 deez nuts inc",
                   textAlign: TextAlign.center,
                   style: theme.typography.small,
                 ),
