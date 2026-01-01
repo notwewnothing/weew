@@ -117,15 +117,6 @@ jobs:
           rm -rf ~/.cargo/git/db
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
-      - name: Create .env file
-        run: |
-          echo "${{ secrets.DOTENV_RELEASE }}" > .env
-
-      - name: Verify .env exists
-        run: |
-          ls -la .env
-          if [ -s .env ]; then echo ".env is not empty"; else echo ".env is empty"; fi
-
       - name: Install ${{matrix.platform}} dependencies
         run: |
           flutter clean
