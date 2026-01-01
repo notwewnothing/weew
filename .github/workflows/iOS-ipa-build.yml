@@ -1,93 +1,41 @@
-name: 🎉 iOS IPA Build
+name: iOS-ipa-build
 
 on:
   workflow_dispatch:
-    inputs:
-      build_variant:
-        description: "Build variant (stable/nightly)"
-        required: true
-        default: "stable"
-        type: choice
-        options:
-          - stable
-          - nightly
 
 jobs:
   build-ios:
-    name: 🎉 iOS Build - ${{ inputs.build_variant }}
+    name: 🎉 iOS Build
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-ios
-
-      - name: Cache Rust
-        uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@v3
 
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
           architecture: x64
+      - run: flutter pub get
 
-      - name: Get Flutter dependencies
-        run: flutter pub get
-
-      - name: Clean Rust cache
-        run: |
-          rm -rf ~/.cargo/registry/cache
-          rm -rf ~/.cargo/git/db
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
-
-      - name: Update CocoaPods repo
+      - run: pod repo update
         working-directory: ios
-        run: pod repo update --silent
 
-      - name: Build iOS IPA
-        run: flutter build ios --release --no-codesign -v
-        env:
-          RUSTFLAGS: "-C target-cpu=native"
+      - run: flutter build ios --release --no-codesign
 
-      - name: Create Payload directory
+      - run: mkdir Payload
         working-directory: build/ios/iphoneos
-        run: mkdir -p Payload
 
-      - name: Move Runner.app to Payload
+      - run: mv Runner.app/ Payload
         working-directory: build/ios/iphoneos
-        run: mv Runner.app Payload/
 
-      - name: Create IPA archive
+      - name: Zip output
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
-        run: zip -qq -r -9 spotube-${{ inputs.build_variant }}.ipa Payload
 
-      - name: Get version from pubspec
-        id: version
-        run: |
-          VERSION=$(grep "^version:" pubspec.yaml | head -1 | awk '{print $2}' | cut -d'+' -f1)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Upload IPA to release
+      - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/ios/iphoneos/spotube-${{ inputs.build_variant }}.ipa
-          tag: v${{ steps.version.outputs.version }}-ios-${{ inputs.build_variant }}
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          tag: v1.0
           overwrite: true
-          body: |
-            # Spotube iOS Build
-
-            **Variant**: ${{ inputs.build_variant }}
-            **Version**: ${{ steps.version.outputs.version }}
-            **Platform**: iOS
-
-            This is an automated iOS IPA build of Spotube.
-
-            ## Installation Instructions
-
-            1. Download the `spotube-${{ inputs.build_variant }}.ipa` file
-            2. Use a tool like Xcode or other IPA installers to deploy to your iOS device
-            3. Ensure your device is trusted with the signing certificate
-
-            For more information, visit: https://github.com/KRTirtho/spotube
+          body: "This is first release"
