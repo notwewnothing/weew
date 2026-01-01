@@ -99,12 +99,23 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          targets: aarch64-apple-ios
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
 
       - name: Install Xcode
         if: ${{matrix.platform == 'ios'}}
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "16.2"
+
+      - name: Clean Rust cache (iOS)
+        if: ${{matrix.platform == 'ios'}}
+        run: |
+          rm -rf ~/.cargo/registry/cache
+          rm -rf ~/.cargo/git/db
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
       - name: Install ${{matrix.platform}} dependencies
         run: |
@@ -119,9 +130,11 @@ jobs:
 
       - name: Build ${{matrix.platform}} binaries
         run: dart cli/cli.dart build --arch=${{matrix.arch}} ${{matrix.platform}}
+        timeout-minutes: 90
         env:
           CHANNEL: ${{inputs.channel}}
           DOTENV: ${{secrets.DOTENV_RELEASE}}
+          RUSTFLAGS: -C target-cpu=native
 
       - uses: actions/upload-artifact@v4
         with:
