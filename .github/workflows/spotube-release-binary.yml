@@ -103,12 +103,11 @@ jobs:
 
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
-
       - name: Install Xcode
         if: ${{matrix.platform == 'ios'}}
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.2"
+        xcode-version: "16.2"
 
       - name: Clean Rust cache (iOS)
         if: ${{matrix.platform == 'ios'}}
@@ -123,6 +122,32 @@ jobs:
           flutter pub get
           dart cli/cli.dart install-dependencies --platform=${{matrix.platform}} --arch=${{matrix.arch}}
 
+# ADD THESE NEW STEPS HERE:
+      - name: Clean and prepare iOS build
+        if: ${{matrix.platform == 'ios'}}
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock .symlinks
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          flutter clean
+          flutter pub get
+          cd ..
+
+      - name: Run pod install
+        if: ${{matrix.platform == 'ios'}}
+        run: |
+          cd ios
+          pod deintegrate || true
+          pod install --repo-update
+          cd ..
+
+      - name: Build ${{matrix.platform}} binaries
+        run: dart cli/cli.dart build --arch=${{matrix.arch}} ${{matrix.platform}}
+        timeout-minutes: 90
+        env:
+          CHANNEL: ${{inputs.channel}}
+          RUSTFLAGS: -C target-cpu=native
+          VERBOSE: "true"
       - name: Sign Apk
         if: ${{matrix.platform == 'android'}}
         run: |
