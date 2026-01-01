@@ -8,12 +8,12 @@ enum ReleaseChannel {
   stable,
 }
 
-@Envied(obfuscate: true, requireEnvFile: true, path: ".env")
+@Envied(obfuscate: true, requireEnvFile: false) // Changed to false
 abstract class Env {
-  @EnviedField(varName: 'LASTFM_API_KEY')
+  @EnviedField(varName: 'LASTFM_API_KEY', defaultValue: 'dummy_lastfm_api_key')
   static final String lastFmApiKey = _Env.lastFmApiKey;
 
-  @EnviedField(varName: 'LASTFM_API_SECRET')
+  @EnviedField(varName: 'LASTFM_API_SECRET', defaultValue: 'dummy_lastfm_api_secret')
   static final String lastFmApiSecret = _Env.lastFmApiSecret;
 
   @EnviedField(varName: 'HIDE_DONATIONS', defaultValue: "0")
