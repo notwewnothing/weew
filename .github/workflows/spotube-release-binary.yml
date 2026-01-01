@@ -61,7 +61,7 @@ jobs:
             platform: ios
             arch: all
             files: |
-              Spotube-iOS.ipa
+              build/ios/archive/Runner.xcarchive/Products/Applications/*.app
           - os: macos-14
             platform: macos
             arch: all
@@ -117,6 +117,23 @@ jobs:
           rm -rf ~/.cargo/git/db
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
+      - name: Setup Flutter for iOS
+        if: ${{matrix.platform == 'ios'}}
+        run: |
+          # Clean everything first
+          flutter clean
+          rm -rf ios/Pods
+          rm -rf ios/.symlinks
+          rm ios/Podfile.lock
+          
+          # Generate Flutter dependencies
+          flutter pub get
+          
+          # Setup Flutter for iOS
+          cd ios
+          pod install --repo-update
+          cd ..
+
       - name: Install ${{matrix.platform}} dependencies
         run: |
           flutter clean
@@ -130,12 +147,32 @@ jobs:
           echo '${{ secrets.KEY_PROPERTIES }}' > android/key.properties
 
       - name: Build ${{matrix.platform}} binaries
-        run: dart cli/cli.dart build --arch=${{matrix.arch}} ${{matrix.platform}}
+        run: |
+          if [ "${{matrix.platform}}" = "ios" ]; then
+            # Fix Xcode build settings
+            echo '#!/bin/bash' > xcode_fix.sh
+            echo 'xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos GCC_TREAT_WARNINGS_AS_ERRORS=NO CODE_SIGNING_ALLOWED=NO build' >> xcode_fix.sh
+            chmod +x xcode_fix.sh
+            
+            # Clean and build iOS
+            cd ios
+            xcodebuild clean
+            cd ..
+            
+            # Build with Flutter
+            flutter build ios --release --no-codesign
+            
+            # Alternatively, try building IPA directly
+            # flutter build ipa --release --no-codesign --export-options-plist=ios/ExportOptions.plist
+          else
+            dart cli/cli.dart build --arch=${{matrix.arch}} ${{matrix.platform}}
+          fi
         timeout-minutes: 90
         env:
           CHANNEL: ${{inputs.channel}}
           RUSTFLAGS: -C target-cpu=native
           VERBOSE: "true"
+          FLUTTER_BUILD_MODE: release
 
       - uses: actions/upload-artifact@v4
         with:
