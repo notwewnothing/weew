@@ -19,6 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -27,12 +35,20 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
+      - name: Clean Rust cache
+        run: |
+          rm -rf ~/.cargo/registry/cache
+          rm -rf ~/.cargo/git/db
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
       - name: Update CocoaPods repo
         working-directory: ios
-        run: pod repo update
+        run: pod repo update --silent
 
       - name: Build iOS IPA
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign -v
+        env:
+          RUSTFLAGS: "-C target-cpu=native"
 
       - name: Create Payload directory
         working-directory: build/ios/iphoneos
