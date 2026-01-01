@@ -117,6 +117,10 @@ jobs:
           rm -rf ~/.cargo/git/db
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.DOTENV_RELEASE }}" > .env
+
       - name: Install ${{matrix.platform}} dependencies
         run: |
           flutter pub get
@@ -133,7 +137,6 @@ jobs:
         timeout-minutes: 90
         env:
           CHANNEL: ${{inputs.channel}}
-          DOTENV: ${{secrets.DOTENV_RELEASE}}
           RUSTFLAGS: -C target-cpu=native
 
       - uses: actions/upload-artifact@v4
