@@ -115,11 +115,27 @@ jobs:
           rm -rf ~/.cargo/registry/cache
           rm -rf ~/.cargo/git/db
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
+      - name: Backup iOS flavor files
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          mkdir -p ../ios_backup/schemes
+          cp ios/Runner.xcodeproj/xcshareddata/xcschemes/*.xcscheme ../ios_backup/schemes/
+          cp ios/*-Info.plist ../ios_backup/
+          cp ios/*.entitlements ../ios_backup/
+
       - name: Regenerate iOS project
         if: ${{ matrix.platform == 'ios' }}
         run: |
           rm -rf ios
           flutter create . --platforms=ios
+
+      - name: Restore iOS flavor files
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          mkdir -p ios/Runner.xcodeproj/xcshareddata/xcschemes/
+          cp ../ios_backup/schemes/*.xcscheme ios/Runner.xcodeproj/xcshareddata/xcschemes/
+          cp ../ios_backup/*-Info.plist ios/
+          cp ../ios_backup/*.entitlements ios/
 
       - name: Restore AppDelegate.swift
         if: ${{ matrix.platform == 'ios' }}
@@ -160,6 +176,9 @@ jobs:
           flutter clean
           flutter pub get
           cd ..
+      - name: Precache Flutter iOS artifacts
+        if: ${{ matrix.platform == 'ios' }}
+        run: flutter precache --ios
 
       - name: Run pod install
         if: ${{matrix.platform == 'ios'}}
