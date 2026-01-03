@@ -176,31 +176,6 @@ jobs:
           flutter pub get
           dart cli/cli.dart install-dependencies --platform=${{matrix.platform}} --arch=${{matrix.arch}}
 
-      - name: Modify Podfile for Swift Version
-        if: ${{ matrix.platform == 'ios' }}
-        run: |
-          PODFILE_PATH="ios/Podfile"
-          # Replace the commented out platform line with the correct one.
-          sed -i '' "s/# platform :ios, '11.0'/platform :ios, '13.0'/" "$PODFILE_PATH"
-
-          # Create the new post_install block
-          cat > post_install_block.txt <<'EOF'
-          post_install do |installer|
-            installer.pods_project.targets.each do |target|
-              flutter_additional_ios_build_settings(target)
-              target.build_configurations.each do |config|
-                config.build_settings['SWIFT_VERSION'] = '5.0'
-              end
-            end
-          end
-          EOF
-
-          # Remove the old post_install block
-          sed -i '' '/post_install do/,/end/d' "$PODFILE_PATH"
-
-          # Append the new post_install block
-          cat post_install_block.txt >> "$PODFILE_PATH"
-
       - name: Precache Flutter iOS artifacts
         if: ${{ matrix.platform == 'ios' }}
         run: flutter precache --ios
