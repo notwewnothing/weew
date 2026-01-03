@@ -37,3 +37,29 @@ end
 
 # Save the project
 project.save
+
+# ---- Modify Podfile ----
+podfile_path = 'ios/Podfile'
+podfile_content = File.read(podfile_path)
+
+# Set platform version
+podfile_content.gsub!(/# platform :ios, '11.0'/, "platform :ios, '13.0'")
+
+# Define the new post_install block
+new_post_install_block = <<-BLOCK
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+    end
+  end
+end
+BLOCK
+
+# Replace the existing post_install block
+podfile_content.gsub!(/post_install do \|installer\|.*?end/m, new_post_install_block)
+
+# Write the changes back to the Podfile
+File.write(podfile_path, podfile_content)
+puts "Successfully modified Podfile with platform and Swift version."
