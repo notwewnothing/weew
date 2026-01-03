@@ -116,23 +116,65 @@ jobs:
           rm -rf ~/.cargo/git/db
           rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
+      - name: Backup iOS flavor files
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          mkdir -p ../ios_backup/schemes
+          cp ios/Runner.xcodeproj/xcshareddata/xcschemes/*.xcscheme ../ios_backup/schemes/
+          cp ios/*-Info.plist ../ios_backup/
+          cp ios/*.entitlements ../ios_backup/
+
+      - name: Regenerate iOS project
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          rm -rf ios
+          flutter create . --platforms=ios
+
+      - name: Install xcodeproj gem
+        if: ${{ matrix.platform == 'ios' }}
+        run: gem install xcodeproj
+
+      - name: Add iOS build configurations
+        if: ${{ matrix.platform == 'ios' }}
+        run: ruby scripts/add_ios_configs.rb
+
+      - name: Restore iOS flavor files
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          mkdir -p ios/Runner.xcodeproj/xcshareddata/xcschemes/
+          cp ../ios_backup/schemes/*.xcscheme ios/Runner.xcodeproj/xcshareddata/xcschemes/
+          cp ../ios_backup/*-Info.plist ios/
+          cp ../ios_backup/*.entitlements ios/
+
+      - name: Restore AppDelegate.swift
+        if: ${{ matrix.platform == 'ios' }}
+        run: |
+          cat > ios/Runner/AppDelegate.swift << EOF
+          import UIKit
+          import Flutter
+
+          @UIApplicationMain
+          @objc class AppDelegate: FlutterAppDelegate {
+            override func application(
+              _ application: UIApplication,
+              didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+            ) -> Bool {
+              // Add this to get Documents directory path
+              if let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.path {
+                  UserDefaults.standard.set(documentsPath, forKey: "download_path")
+              }
+
+              GeneratedPluginRegistrant.register(with: self)
+              return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+            }
+          }
+          EOF
+
       - name: Install ${{matrix.platform}} dependencies
         run: |
           flutter clean
           flutter pub get
           dart cli/cli.dart install-dependencies --platform=${{matrix.platform}} --arch=${{matrix.arch}}
-
-# ADD THESE NEW STEPS HERE:
-      - name: Clean and prepare iOS build
-        if: ${{matrix.platform == 'ios'}}
-        run: |
-          flutter clean
-          cd ios
-          rm -rf Podfile.lock Pods Runner.xcworkspace
-          pod deintegrate || true
-          pod cache clean --all || true
-          cd ..
-          flutter pub get
 
       - name: Precache Flutter iOS artifacts
         if: ${{ matrix.platform == 'ios' }}
