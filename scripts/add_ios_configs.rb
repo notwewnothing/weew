@@ -29,7 +29,7 @@ configs_to_create.each do |config_name|
   new_config = project.new(Xcodeproj::Project::Object::XCBuildConfiguration)
   new_config.name = config_name
   new_config.build_settings = source_config.build_settings.clone
-  project.projects.first.build_configuration_list.build_configurations << new_config
+  project.build_configuration_list.build_configurations << new_config
 
 
   puts "Successfully created configuration '#{config_name}'"
