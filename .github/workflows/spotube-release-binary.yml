@@ -1,4 +1,4 @@
-ame: Spotube Release Binary
+name: Spotube Release Binary
 on:
   workflow_dispatch:
     inputs:
